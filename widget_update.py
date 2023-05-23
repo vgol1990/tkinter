@@ -20,3 +20,12 @@ class Configure_widgets:
         else:
             self.overrideredirect(True)
         self.update()
+
+    def clear_win(self):
+        for i in self.winfo_children():
+            i.destroy()
+
+    def configure_minimal_win(self):
+        self.bar_one.configure(value=self.cpu.cpu_one_return())
+        self.ram_bar.configure(value=self.cpu.ram_usage()[2])
+        self.wheel = self.after(1000, self.configure_minimal_win)

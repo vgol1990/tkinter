@@ -15,6 +15,9 @@ class Application(tk.Tk, Configure_widgets):
         self.title('CPU-RAM usage monitor bar')
 
         self.cpu = CpuBar()
+        self.run_set_ui()
+
+    def run_set_ui(self):
         self.set_ui()
         self.make_bar_cpu_usage()
         self.configure_cpu_bar()
@@ -41,7 +44,7 @@ class Application(tk.Tk, Configure_widgets):
 
         self.bind_class('Tk', '<Enter>', self.enter_mouse)
         self.bind_class('Tk', '<Leave>', self.leave_mouse)
-
+        self.combo_win.bind('<<ComboboxSelected>>', self.choise_combo)
     def make_bar_cpu_usage(self):
         ttk.Label(self.bar, text=f'physical cores: {self.cpu.cpu_count}, logical cores: {self.cpu.cpu_count_logical}',
                     anchor=tk.CENTER).pack(fill=tk.X)
@@ -69,6 +72,37 @@ class Application(tk.Tk, Configure_widgets):
         if self.combo_win.current() == 0:
             self.geometry(f'{self.winfo_width()}x1')
 
+    def make_minimal_win(self):
+        self.bar_one = ttk.Progressbar(self, length=100)
+        self.bar_one.pack(side=tk.LEFT)
+
+        self.ram_bar = ttk.Progressbar(self, length=100)
+        self.ram_bar.pack(side=tk.LEFT)
+
+        ttk.Button(self, text='full', command=self.make_full_win,width=5).pack(side=tk.RIGHT)
+        ttk.Button(self, text='move', width=5, command=self.configure_win).pack(side=tk.RIGHT)
+
+        self.update()
+        self.configure_minimal_win()
+
+    def choise_combo(self, event):
+        if self.combo_win.current() == 2:
+            self.enter_mouse('')
+            self.unbind_class('Tk', '<Enter>')
+            self.unbind_class('Tk', '<Leave?')
+            self.combo_win.unbind('<<Combobox_Selected>>')
+            self.after_cancel(self.wheel)
+            self.clear_win()
+            self.update()
+            self.make_minimal_win()
+
+    def make_full_win(self):
+        self.after_cancel(self.wheel)
+        self.clear_win()
+        self.update()
+        self.run_set_ui()
+        self.enter_mouse('')
+        self.combo_win.current(1)
 
     def app_exit(self):
         self.destroy()
